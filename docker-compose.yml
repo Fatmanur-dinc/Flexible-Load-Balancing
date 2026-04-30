@@ -1,0 +1,66 @@
+services:
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - loadbalancing-network
+
+  product-service-1:
+    build: ./product-service
+    container_name: product-service-1
+    environment:
+      - SERVER_PORT=8081
+      - INSTANCE_ID=product-instance-1
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+    restart: on-failure
+    networks:
+      - loadbalancing-network
+
+  product-service-2:
+    build: ./product-service
+    container_name: product-service-2
+    environment:
+      - SERVER_PORT=8082
+      - INSTANCE_ID=product-instance-2
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eureka-server
+    restart: on-failure
+    networks:
+      - loadbalancing-network
+
+  product-service-3:
+    build: ./product-service
+    container_name: product-service-3
+    environment:
+      - SERVER_PORT=8083
+      - INSTANCE_ID=product-instance-3
+    ports:
+      - "8083:8083"
+    depends_on:
+      - eureka-server
+    restart: on-failure
+    networks:
+      - loadbalancing-network
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    restart: on-failure
+    networks:
+      - loadbalancing-network
+
+networks:
+  loadbalancing-network:
+    driver: bridge
